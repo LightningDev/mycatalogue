@@ -16,6 +16,7 @@ class CatalogueScreens: UIViewController {
     //        return BackgroundFunctions.isConnectedToNetwork()
     //    }
     var checkConnection: Bool = true
+    @IBOutlet weak var choiceMat: UISegmentedControl!
     
     // Pickerview
     @IBOutlet weak var matgroupView: UIView!
@@ -70,8 +71,20 @@ class CatalogueScreens: UIViewController {
         
     }
     
+    @IBAction func choiceMatIndexChanged(sender: UISegmentedControl) {
+        switch choiceMat.selectedSegmentIndex
+        {
+        case 0:
+            chooseMatGroup()
+        case 1:
+            chooseSubMatGroup()
+        default:
+            break
+        }
+    }
+    
     // Load material groups
-    @IBAction func addPopover(sender: UIBarButtonItem) {
+    func chooseMatGroup() {
         if (checkConnection) {
             // Send API request to get data
             //loadMaterialGroups()
@@ -89,6 +102,14 @@ class CatalogueScreens: UIViewController {
             self.hidePickerView(false)
             self.matgroupPickerView.reloadAllComponents()
         }
+    }
+    
+    func chooseSubMatGroup() {
+        
+    }
+    
+    @IBAction func addPopover(sender: UIBarButtonItem) {
+        
     }
     
     // Select mat group from picker view
@@ -114,34 +135,6 @@ class CatalogueScreens: UIViewController {
                 // Query from Realm
                 self.numCell = self.catalogue.materialGroups[selectedRow].materials.count
                 self.myCollection.reloadData()
-                //                //dispatch_async(dispatch_get_main_queue()) {
-                //                BackgroundFunctions.mitigrateRealm()
-                //                let realm = try! Realm()
-                //                let materialGroups: MaterialGroups = realm.objectForPrimaryKey(MaterialGroups.self, key: mgCode!)!
-                //                let matCnt = materialGroups.materials.count
-                //                var indexArr: [NSIndexPath] = [NSIndexPath]()
-                //                for j in 0..<matCnt {
-                //                    let matItem = materialGroups.materials[j]
-                //                    let itemAt: Int = self.numCell + j
-                //                    let index: NSIndexPath = NSIndexPath(forItem: itemAt, inSection: 0)
-                //                    indexArr.append(index)
-                //                    self.codeList.append(matItem.code)
-                //                    self.descList.append(matItem.desc!)
-                //                    self.stockList.append(String(matItem.stock))
-                //                    var stringURl: String = matItem.path!
-                //                    if (stringURl == "<null>") {
-                //                        stringURl = ""
-                //                    }
-                //                    let url: NSURL = NSURL(string: stringURl)!
-                //                    self.imageList.append(url)
-                //                    self.myCollection.reloadData()
-                //                    //self.myCollection.performSelectorOnMainThread(Selector("reloadData"), withObject: nil, waitUntilDone: true)
-                //                }
-                //                self.numCell += matCnt
-                //                print("call it")
-                //self.myCollection.insertItemsAtIndexPaths(indexArr)
-                //self.myCollection.performSelectorOnMainThread(Selector("insertItemsAtIndexPaths"), withObject: indexArr, waitUntilDone: true)
-                //}
             }
             
         }
@@ -165,7 +158,7 @@ class CatalogueScreens: UIViewController {
     }
     
     // Get material groups from server
-    func loadMaterialGroups() {
+    @available(*, deprecated=1.0) func loadMaterialGroups() {
         let url: String = NetworkList.Address.rawValue + NetworkList.MatgroupAddress.rawValue
         let username = NetworkList.Username.rawValue
         let password = NetworkList.Password.rawValue
@@ -198,7 +191,7 @@ class CatalogueScreens: UIViewController {
     }
     
     // Get sub-material by material group
-    func loadCatalogueList(mgCode: String) {
+    @available(*, deprecated=1.0) func loadCatalogueList(mgCode: String) {
         let url: String = NetworkList.Address.rawValue + NetworkList.MatgroupAddress.rawValue + "/" + mgCode
         let username = NetworkList.Username.rawValue
         let password = NetworkList.Password.rawValue
@@ -245,10 +238,11 @@ class CatalogueScreens: UIViewController {
 // MARK: - Delegate protocol for detail page
 extension CatalogueScreens: CatalogueDetailsDelegate {
     func loadCatalogueDetails(controller: CatalogueDetails) {
-        controller.codeText.text = self.codeList[self.selectedCell!]
-        controller.descText.text = self.descList[self.selectedCell!]
-        controller.stockText.text = self.stockList[self.selectedCell!]
-        controller.image.downloadedFrom(self.imageList[self.selectedCell!])
+        let selectedRow = self.matgroupPickerView.selectedRowInComponent(0)
+        controller.codeText.text = self.catalogue.materialGroups[selectedRow].materials[self.selectedCell!].code
+        controller.descText.text = self.catalogue.materialGroups[selectedRow].materials[self.selectedCell!].desc
+        controller.stockText.text = String(self.catalogue.materialGroups[selectedRow].materials[self.selectedCell!].stock)
+        //controller.image.downloadedFrom(self.imageList[self.selectedCell!])
     }
 }
 
@@ -320,22 +314,17 @@ extension CatalogueScreens: UICollectionViewDataSource {
             cell.descLabel.text = self.catalogue.materialGroups[selectedRow].materials[indexPath.row].desc
             cell.stockField.text = String(self.catalogue.materialGroups[selectedRow].materials[indexPath.row].stock)
             
-            //            if (!self.checkConnection) {
-            //                let imgPath = self.imageList[indexPath.row].path!
-            //                cell.myImage.image = UIImage(contentsOfFile: imgPath)
-            //            } else {
-            //                cell.myImage.downloadedFrom(self.imageList[indexPath.row])
-            //            }
+            if (!self.checkConnection) {
+                let imgPath = self.imageList[indexPath.row].path!
+                cell.myImage.image = UIImage(contentsOfFile: imgPath)
+            } else {
+                cell.myImage.downloadedFrom(self.imageList[indexPath.row])
+            }
             
             cell.backgroundColor = UIColor.whiteColor() // make cell more visible in our example project
             cell.layer.borderColor = UIColor.grayColor().CGColor
             cell.layer.borderWidth = 1
             cell.layer.cornerRadius = 8
-        }
-        
-        if (self.catalogue.finish) {
-            
-            
         }
         
         return cell
@@ -354,17 +343,4 @@ extension CatalogueScreens: UICollectionViewDelegate {
     
 }
 
-extension UIImageView {
-    func downloadedFrom(url: NSURL, contentMode mode: UIViewContentMode = .ScaleAspectFit) {
-        let networkHandler = NetworkHandler(endPointUrl: "", username: "", password: "")
-        
-        networkHandler.getDataFromUrl(url) { data, response, error in
-            if data != nil {
-                self.image = UIImage(data: data)
-            } else {
-                print(error)
-            }
-        }
-        
-    }
-}
+

@@ -17,6 +17,7 @@ class Catalogue {
     var finish: Bool = true
     // Material group
     var materialGroups = [MaterialGroups]()
+    var subMaterialGroups = [SubMaterialGroups]()
     var countGroup: Int {
         return materialGroups.count
     }
@@ -102,7 +103,7 @@ class Catalogue {
                     testItem.path = String(item["path"]!!)
                     self.materialGroups[index].materials.append(testItem)
                 }
-                print("Current checkCount of \(code)")
+                //print("Check this code mate \(code)")
                 if (apiRequest != nil) {
                     dispatch_group_leave(apiRequest!)
                 }
@@ -117,7 +118,7 @@ class Catalogue {
     private func downloadMaterialGroup() {
         // Declare api header
         let group = dispatch_group_create()
-        let url: String = NetworkList.Address.rawValue + NetworkList.MatgroupAddress.rawValue
+        let url: String = NetworkList.Address.rawValue + NetworkList.offline.rawValue
         let username = NetworkList.Username.rawValue
         let password = NetworkList.Password.rawValue
         let networkHandler = NetworkHandler(endPointUrl: url, username: username, password: password)
@@ -166,7 +167,7 @@ class Catalogue {
     // Download sub material
     private func downloadSubMaterial(code: String, index: Int, apiGroup: dispatch_group_t) {
         // Declare api header
-        let url: String = NetworkList.Address.rawValue + NetworkList.MatgroupAddress.rawValue + "/" + code
+        let url: String = NetworkList.Address.rawValue + NetworkList.offline.rawValue + "/" + code
         let username = NetworkList.Username.rawValue
         let password = NetworkList.Password.rawValue
         let networkHandler = NetworkHandler(endPointUrl: url, username: username, password: password)
@@ -202,12 +203,52 @@ class Catalogue {
         }
     }
     
-    // test download image
-    func downloadImage() {
+    // download submaterialgroup
+    func downloadSubMaterialGroup(code: String, index: Int, apiGroup: dispatch_group_t) {
+        // Declare api header
         let group = dispatch_group_create()
+        let url: String = NetworkList.Address.rawValue + NetworkList.SubMaterialGroupAddress.rawValue
+        let username = NetworkList.Username.rawValue
+        let password = NetworkList.Password.rawValue
+        let networkHandler = NetworkHandler(endPointUrl: url, username: username, password: password)
+        // Call it
+        dispatch_group_enter(group)
+        networkHandler.sendGetRequest("", parameters: "") { response, error in
+            if response != nil {
+                let dict: NSDictionary = networkHandler.convertToDict(response!)
+                
+                let jsonArr  = dict["_embedded"]!["item"] as! NSArray
+                let jsonCnt: Int = jsonArr.count
+                for i in 0..<jsonCnt {
+                    let item = jsonArr[i]
+                    
+                    // test
+                    var materialGroup = SubMaterialGroups()
+                    materialGroup.code = String(item["code"]!!)
+                    materialGroup.desc = String(item["description"]!!)
+                    self.subMaterialGroups.append(materialGroup)
+                }
+                dispatch_group_leave(group)
+            }else {
+                print(error)
+                return
+            }
+        }
+        
+        dispatch_group_notify(group, dispatch_get_main_queue()) {
+            // Get the material in sub group
+            
+        }
+    }
+    
+    // download Image
+    func downloadImage(apiRequest: dispatch_group_t? = nil) {
+     
+        let apiRequest = dispatch_group_create()
+     
         let networkHandler = NetworkHandler(endPointUrl: "", username: "", password: "")
         let url = NSURL(string: (NetworkList.Address.rawValue + NetworkList.ImagesAddress.rawValue))
-        dispatch_group_enter(group)
+        dispatch_group_enter(apiRequest)
         networkHandler.getDataFromUrl(url!) { data, response, error in
             if (data != nil) {
                 let filePath = BackgroundFunctions.getImageDirectory().URLByAppendingPathComponent("images")
@@ -216,10 +257,10 @@ class Catalogue {
             } else {
                 print(error)
             }
-            dispatch_group_leave(group)
+            dispatch_group_leave(apiRequest)
         }
         
-        dispatch_group_notify(group, dispatch_get_main_queue()) {
+        dispatch_group_notify(apiRequest, dispatch_get_main_queue()) {
             if (self.update) {
                 // insert to realm
                 for i in 0..<self.countGroup {

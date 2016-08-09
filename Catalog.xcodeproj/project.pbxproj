@@ -10,13 +10,29 @@
 		4837EAF31D04C698C9DA0339 /* Pods_Catalog.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BE713AF2101FCEABF7573B /* Pods_Catalog.framework */; };
 		CE28DE601D0A7DCC00CCF6B1 /* GridViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE28DE5F1D0A7DCC00CCF6B1 /* GridViewController.swift */; };
 		CE28DE641D0E5E1F00CCF6B1 /* GridViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE28DE631D0E5E1F00CCF6B1 /* GridViewCell.swift */; };
+		CE2DB7BD1D35D15400A32ED4 /* ContactList.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2DB7BC1D35D15400A32ED4 /* ContactList.swift */; };
+		CE2DB7BF1D35E65C00A32ED4 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2DB7BE1D35E65C00A32ED4 /* Contacts.swift */; };
+		CE3D1F001D5939C3007E00C0 /* PartDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3D1EFF1D5939C3007E00C0 /* PartDetails.swift */; };
 		CE4198371D07B31F003A22C3 /* AccountsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4198361D07B31F003A22C3 /* AccountsScreen.swift */; };
+		CE4A48941D52B28C00D86B3B /* SalesDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A48931D52B28C00D86B3B /* SalesDetail.swift */; };
+		CE4A48961D52BF8A00D86B3B /* SalesDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A48951D52BF8A00D86B3B /* SalesDetailCell.swift */; };
+		CE4A48981D53072A00D86B3B /* SalesDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A48971D53072A00D86B3B /* SalesDetails.swift */; };
+		CE4EA9F31D4ABA7D00AF6037 /* SalesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4EA9F21D4ABA7D00AF6037 /* SalesCell.swift */; };
+		CE4ECCEC1D4718A700D46B06 /* SalesOrder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4ECCEB1D4718A700D46B06 /* SalesOrder.swift */; };
+		CE4ECCEE1D47224E00D46B06 /* SalesOrders.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4ECCED1D47224E00D46B06 /* SalesOrders.swift */; };
+		CE4ECCF01D47331800D46B06 /* Parts.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4ECCEF1D47331800D46B06 /* Parts.swift */; };
 		CE5BFE641D24AE6300049BE6 /* Diecast-splash screen.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CE5BFE631D24AE6300049BE6 /* Diecast-splash screen.jpg */; };
 		CE5DB3401D18FA6800195E25 /* BackgroundFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5DB33F1D18FA6800195E25 /* BackgroundFunctions.swift */; };
+		CE77FF5B1D347563003F57C0 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE77FF5A1D347563003F57C0 /* Extensions.swift */; };
+		CE77FF971D34BF50003F57C0 /* Favourites.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE77FF961D34BF50003F57C0 /* Favourites.swift */; };
 		CE78290F1D1766F8009E1BEE /* CatalogueDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE78290E1D1766F8009E1BEE /* CatalogueDetails.swift */; };
+		CE834AD91D45905300F62237 /* SubMaterialGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE834AD81D45905300F62237 /* SubMaterialGroups.swift */; };
 		CE9D7B6D1D0910D30099B0A6 /* NetworkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9D7B6C1D0910D30099B0A6 /* NetworkHandler.swift */; };
 		CEA41FDE1D2B1F41004704FE /* Catalogue.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA41FDD1D2B1F41004704FE /* Catalogue.swift */; };
 		CEA41FE11D2B2052004704FE /* NetworkList.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA41FE01D2B2052004704FE /* NetworkList.swift */; };
+		CEAE7F501D36F61600C3E664 /* ContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAE7F4F1D36F61600C3E664 /* ContactCell.swift */; };
+		CEAE7F521D371A0E00C3E664 /* ContactDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAE7F511D371A0E00C3E664 /* ContactDetails.swift */; };
+		CEAE7F551D3737AC00C3E664 /* ContactInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAE7F541D3737AC00C3E664 /* ContactInformation.swift */; };
 		CEBC66131D08DF3700681958 /* CatalogueScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBC66121D08DF3700681958 /* CatalogueScreens.swift */; };
 		CEBC66151D08DF5400681958 /* SalesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBC66141D08DF5400681958 /* SalesScreen.swift */; };
 		CED9343D1D0788A700C9DBCC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED9343C1D0788A700C9DBCC /* AppDelegate.swift */; };
@@ -45,13 +61,29 @@
 		63626AFA0BB6334F9892ED9A /* Pods-Catalog.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Catalog.release.xcconfig"; path = "Pods/Target Support Files/Pods-Catalog/Pods-Catalog.release.xcconfig"; sourceTree = "<group>"; };
 		CE28DE5F1D0A7DCC00CCF6B1 /* GridViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GridViewController.swift; sourceTree = "<group>"; };
 		CE28DE631D0E5E1F00CCF6B1 /* GridViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GridViewCell.swift; sourceTree = "<group>"; };
+		CE2DB7BC1D35D15400A32ED4 /* ContactList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactList.swift; sourceTree = "<group>"; };
+		CE2DB7BE1D35E65C00A32ED4 /* Contacts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Contacts.swift; sourceTree = "<group>"; };
+		CE3D1EFF1D5939C3007E00C0 /* PartDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PartDetails.swift; sourceTree = "<group>"; };
 		CE4198361D07B31F003A22C3 /* AccountsScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountsScreen.swift; sourceTree = "<group>"; };
+		CE4A48931D52B28C00D86B3B /* SalesDetail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SalesDetail.swift; sourceTree = "<group>"; };
+		CE4A48951D52BF8A00D86B3B /* SalesDetailCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SalesDetailCell.swift; sourceTree = "<group>"; };
+		CE4A48971D53072A00D86B3B /* SalesDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SalesDetails.swift; sourceTree = "<group>"; };
+		CE4EA9F21D4ABA7D00AF6037 /* SalesCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SalesCell.swift; sourceTree = "<group>"; };
+		CE4ECCEB1D4718A700D46B06 /* SalesOrder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SalesOrder.swift; sourceTree = "<group>"; };
+		CE4ECCED1D47224E00D46B06 /* SalesOrders.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SalesOrders.swift; sourceTree = "<group>"; };
+		CE4ECCEF1D47331800D46B06 /* Parts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parts.swift; sourceTree = "<group>"; };
 		CE5BFE631D24AE6300049BE6 /* Diecast-splash screen.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Diecast-splash screen.jpg"; sourceTree = "<group>"; };
 		CE5DB33F1D18FA6800195E25 /* BackgroundFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundFunctions.swift; sourceTree = "<group>"; };
+		CE77FF5A1D347563003F57C0 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		CE77FF961D34BF50003F57C0 /* Favourites.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Favourites.swift; sourceTree = "<group>"; };
 		CE78290E1D1766F8009E1BEE /* CatalogueDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CatalogueDetails.swift; sourceTree = "<group>"; };
+		CE834AD81D45905300F62237 /* SubMaterialGroups.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubMaterialGroups.swift; sourceTree = "<group>"; };
 		CE9D7B6C1D0910D30099B0A6 /* NetworkHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkHandler.swift; sourceTree = "<group>"; };
 		CEA41FDD1D2B1F41004704FE /* Catalogue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Catalogue.swift; sourceTree = "<group>"; };
 		CEA41FE01D2B2052004704FE /* NetworkList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkList.swift; sourceTree = "<group>"; };
+		CEAE7F4F1D36F61600C3E664 /* ContactCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContactCell.swift; path = ../ContactCell.swift; sourceTree = "<group>"; };
+		CEAE7F511D371A0E00C3E664 /* ContactDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactDetails.swift; sourceTree = "<group>"; };
+		CEAE7F541D3737AC00C3E664 /* ContactInformation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactInformation.swift; sourceTree = "<group>"; };
 		CEBC66121D08DF3700681958 /* CatalogueScreens.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CatalogueScreens.swift; sourceTree = "<group>"; };
 		CEBC66141D08DF5400681958 /* SalesScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SalesScreen.swift; sourceTree = "<group>"; };
 		CED934371D0788A700C9DBCC /* Catalog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Catalog.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,6 +132,10 @@
 			isa = PBXGroup;
 			children = (
 				CEA41FDD1D2B1F41004704FE /* Catalogue.swift */,
+				CE77FF5A1D347563003F57C0 /* Extensions.swift */,
+				CEAE7F541D3737AC00C3E664 /* ContactInformation.swift */,
+				CE4ECCED1D47224E00D46B06 /* SalesOrders.swift */,
+				CE4A48971D53072A00D86B3B /* SalesDetails.swift */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -110,6 +146,27 @@
 				CEA41FE01D2B2052004704FE /* NetworkList.swift */,
 			);
 			name = Enumeration;
+			sourceTree = "<group>";
+		};
+		CEAE7F531D371A3F00C3E664 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				CED9343E1D0788A700C9DBCC /* MainMenu.swift */,
+				CE4198361D07B31F003A22C3 /* AccountsScreen.swift */,
+				CEAE7F4F1D36F61600C3E664 /* ContactCell.swift */,
+				CEBC66121D08DF3700681958 /* CatalogueScreens.swift */,
+				CEBC66141D08DF5400681958 /* SalesScreen.swift */,
+				CE28DE5F1D0A7DCC00CCF6B1 /* GridViewController.swift */,
+				CE28DE631D0E5E1F00CCF6B1 /* GridViewCell.swift */,
+				CE78290E1D1766F8009E1BEE /* CatalogueDetails.swift */,
+				CE2DB7BC1D35D15400A32ED4 /* ContactList.swift */,
+				CEAE7F511D371A0E00C3E664 /* ContactDetails.swift */,
+				CE4EA9F21D4ABA7D00AF6037 /* SalesCell.swift */,
+				CE4A48931D52B28C00D86B3B /* SalesDetail.swift */,
+				CE4A48951D52BF8A00D86B3B /* SalesDetailCell.swift */,
+				CE3D1EFF1D5939C3007E00C0 /* PartDetails.swift */,
+			);
+			name = Controller;
 			sourceTree = "<group>";
 		};
 		CED9342E1D0788A700C9DBCC = {
@@ -140,18 +197,12 @@
 				CEE8FF3F1D2225B0003ACBEC /* Image */,
 				CEE8FF3A1D21FE7B003ACBEC /* Database */,
 				CED9343C1D0788A700C9DBCC /* AppDelegate.swift */,
-				CED9343E1D0788A700C9DBCC /* MainMenu.swift */,
+				CEAE7F531D371A3F00C3E664 /* Controller */,
 				CED934401D0788A700C9DBCC /* Main.storyboard */,
 				CED934431D0788A700C9DBCC /* Images.xcassets */,
 				CED934451D0788A700C9DBCC /* LaunchScreen.xib */,
 				CED9343A1D0788A700C9DBCC /* Supporting Files */,
-				CE4198361D07B31F003A22C3 /* AccountsScreen.swift */,
-				CEBC66121D08DF3700681958 /* CatalogueScreens.swift */,
-				CEBC66141D08DF5400681958 /* SalesScreen.swift */,
 				CE9D7B6C1D0910D30099B0A6 /* NetworkHandler.swift */,
-				CE28DE5F1D0A7DCC00CCF6B1 /* GridViewController.swift */,
-				CE28DE631D0E5E1F00CCF6B1 /* GridViewCell.swift */,
-				CE78290E1D1766F8009E1BEE /* CatalogueDetails.swift */,
 				CE5DB33F1D18FA6800195E25 /* BackgroundFunctions.swift */,
 			);
 			path = Catalog;
@@ -185,8 +236,13 @@
 		CEE8FF3A1D21FE7B003ACBEC /* Database */ = {
 			isa = PBXGroup;
 			children = (
+				CE2DB7BE1D35E65C00A32ED4 /* Contacts.swift */,
 				CEE8FF3B1D21FEE2003ACBEC /* MaterialGroups.swift */,
 				CEE8FF3D1D21FF16003ACBEC /* Materials.swift */,
+				CE77FF961D34BF50003F57C0 /* Favourites.swift */,
+				CE834AD81D45905300F62237 /* SubMaterialGroups.swift */,
+				CE4ECCEB1D4718A700D46B06 /* SalesOrder.swift */,
+				CE4ECCEF1D47331800D46B06 /* Parts.swift */,
 			);
 			name = Database;
 			sourceTree = "<group>";
@@ -410,19 +466,35 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEE8FF3E1D21FF16003ACBEC /* Materials.swift in Sources */,
+				CEAE7F521D371A0E00C3E664 /* ContactDetails.swift in Sources */,
 				CEE8FF3C1D21FEE2003ACBEC /* MaterialGroups.swift in Sources */,
+				CE4A48961D52BF8A00D86B3B /* SalesDetailCell.swift in Sources */,
+				CE4A48941D52B28C00D86B3B /* SalesDetail.swift in Sources */,
+				CE3D1F001D5939C3007E00C0 /* PartDetails.swift in Sources */,
+				CE4ECCEE1D47224E00D46B06 /* SalesOrders.swift in Sources */,
+				CE2DB7BF1D35E65C00A32ED4 /* Contacts.swift in Sources */,
 				CEA41FE11D2B2052004704FE /* NetworkList.swift in Sources */,
+				CE2DB7BD1D35D15400A32ED4 /* ContactList.swift in Sources */,
+				CEAE7F551D3737AC00C3E664 /* ContactInformation.swift in Sources */,
 				CEA41FDE1D2B1F41004704FE /* Catalogue.swift in Sources */,
 				CED9343F1D0788A700C9DBCC /* MainMenu.swift in Sources */,
 				CEBC66151D08DF5400681958 /* SalesScreen.swift in Sources */,
 				CE78290F1D1766F8009E1BEE /* CatalogueDetails.swift in Sources */,
+				CEAE7F501D36F61600C3E664 /* ContactCell.swift in Sources */,
+				CE4ECCEC1D4718A700D46B06 /* SalesOrder.swift in Sources */,
 				CE5DB3401D18FA6800195E25 /* BackgroundFunctions.swift in Sources */,
 				CEBC66131D08DF3700681958 /* CatalogueScreens.swift in Sources */,
 				CE28DE601D0A7DCC00CCF6B1 /* GridViewController.swift in Sources */,
+				CE834AD91D45905300F62237 /* SubMaterialGroups.swift in Sources */,
+				CE77FF5B1D347563003F57C0 /* Extensions.swift in Sources */,
+				CE4A48981D53072A00D86B3B /* SalesDetails.swift in Sources */,
 				CE4198371D07B31F003A22C3 /* AccountsScreen.swift in Sources */,
+				CE4EA9F31D4ABA7D00AF6037 /* SalesCell.swift in Sources */,
+				CE4ECCF01D47331800D46B06 /* Parts.swift in Sources */,
 				CED9343D1D0788A700C9DBCC /* AppDelegate.swift in Sources */,
 				CE28DE641D0E5E1F00CCF6B1 /* GridViewCell.swift in Sources */,
 				CE9D7B6D1D0910D30099B0A6 /* NetworkHandler.swift in Sources */,
+				CE77FF971D34BF50003F57C0 /* Favourites.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

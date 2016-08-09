@@ -71,18 +71,6 @@ class NetworkHandler {
             
         })
         task.resume()
-        
-        //        NSURLSession.sharedSession().dataTaskWithURL(url){ (data, response, error) in
-        //
-        //            dispatch_async(dispatch_get_main_queue()) {
-        //                if (data != nil) {
-        //                    completion(data: data, response: response, error: error)
-        //                } else {
-        //                    completion(data: nil, response: response, error: error)
-        //                }
-        //            }
-        //
-        //            }.resume()
     }
     
     // GET Request

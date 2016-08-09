@@ -11,7 +11,11 @@ import Foundation
 enum NetworkList: String {
     case Username = "OPTO"
     case Password = "opto"
-    case Address = "http://192.168.222.134:8000"
+    case Address = "http://192.168.222.126:8000"
     case MatgroupAddress = "/api/matgroup"
     case ImagesAddress = "/sample/image.zip"
+    case offline = "/api/offlinemat"
+    case ClientAddress = "/api/clients"
+    case SubMaterialGroupAddress = "/api/submatgroup"
+    case SalesOrderAddress = "/api/salesorder"
 }
