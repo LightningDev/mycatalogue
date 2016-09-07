@@ -12,16 +12,23 @@ class ContactDetails: UIViewController {
     
     @IBOutlet weak var contactName: UILabel!
     @IBOutlet weak var contactCode: UILabel!
-    @IBOutlet weak var contactPhone: UILabel!
-    @IBOutlet weak var contactEmail: UILabel!
-    @IBOutlet weak var contactWebsite: UILabel!
+    @IBOutlet weak var contactType: UILabel!
+    @IBOutlet weak var contactPhone: UITextField!
+    @IBOutlet weak var contactEmail: UITextField!
+    @IBOutlet weak var contactWebsite: UITextField!
+    
     var contactList: ContactList? = nil
+    var contact: Contacts!
+    
+    @IBAction func setContactDefault(sender: UIBarButtonItem) {
+        BackgroundFunctions.setdefaultClient(self.contact)
+    }
  
     override func viewDidLoad() {
         super.viewDidLoad()
         if let split = self.splitViewController {
             let navController = split.viewControllers.first as! UINavigationController
-            self.contactList = navController.topViewController as! ContactList
+            self.contactList = navController.topViewController as? ContactList
         }
         self.contactList?.delegate = self
     }
@@ -39,5 +46,6 @@ extension ContactDetails: ContactListDelegate {
         self.contactEmail.text = contact.email
         self.contactPhone.text = contact.phone
         self.contactWebsite.text = contact.website
+        self.contact = contact
     }
 }

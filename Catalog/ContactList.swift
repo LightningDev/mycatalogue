@@ -20,6 +20,9 @@ class ContactList: UIViewController {
     var contactDetail: ContactDetails? = nil
     @IBOutlet weak var tableView: UITableView!
     var delegate: ContactListDelegate? = nil
+    
+    // Online - unstable
+    let checkOnline = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,11 +31,26 @@ class ContactList: UIViewController {
     }
     
     @IBAction func refreshContact() {
-        let apiRequest = dispatch_group_create()
-        self.contactList.importContact(apiRequest)
-        dispatch_group_notify(apiRequest, dispatch_get_main_queue()) {
-            self.tableView.reloadData()
+        if (checkOnline) {
+            let apiRequest = dispatch_group_create()
+            self.contactList.importContact(apiRequest)
+            dispatch_group_notify(apiRequest, dispatch_get_main_queue()) {
+                self.tableView.reloadData()
+            }
+        } else {
+            readContactsLocal()
         }
+
+    }
+    
+    func readContactsLocal() {
+        contactList.getFromRealm()
+        contactList.sortDictionary()
+        self.tableView.reloadData()
+    }
+    
+    @IBAction func goBackHome(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("unwindToHome", sender: self)
     }
 }
 

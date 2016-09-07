@@ -12,7 +12,6 @@ import RealmSwift
 class Favourite: Object {
     dynamic var group = ""
     dynamic var code = ""
-    let objects = List<Object>()
     
     override static func primaryKey() -> String? {
         return "code"

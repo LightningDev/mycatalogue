@@ -27,9 +27,22 @@ class NetworkHandler {
                 
             }
         } catch let error as NSError {
-            print(error.localizedDescription + "=" + checkCode!)
+            print(error.localizedFailureReason)
         }
         return NSDictionary()
+    }
+    
+    func convertToString(jsonStr: NSData, checkCode: String?=nil) -> String {
+        do {
+            if let convertedJsonIntoDict = try NSJSONSerialization.JSONObjectWithData(jsonStr, options: []) as? String {
+                
+                return convertedJsonIntoDict
+                
+            }
+        } catch let error as NSError {
+            print(error.localizedFailureReason)
+        }
+        return ""
     }
     
     // Download
@@ -96,6 +109,7 @@ class NetworkHandler {
             
             dispatch_async(dispatch_get_main_queue()) {
                 if data != nil {
+                    print(response)
                     completionHandler(data, nil)
                 }else {
                     completionHandler(nil, error)
@@ -110,7 +124,8 @@ class NetworkHandler {
         return task
     }
     
-    func sendPostRequest(additionalURl: String, parameters: String, completionHandler: (NSData?, NSError?) -> ()) -> NSURLSessionTask {
+    func sendPostRequest(additionalURl: String, parameters: String, json: Dictionary<String, AnyObject>, completionHandler: (NSData?, NSError?) -> ()) -> NSURLSessionTask {
+        
         // Full URL
         let realURL = endPointUrl + additionalURl + parameters
         
@@ -121,6 +136,9 @@ class NetworkHandler {
         let myRequest = NSMutableURLRequest(URL: myNSURL!)
         myRequest.HTTPMethod = "POST"
         
+        // Append JSON to request body
+        myRequest.HTTPBody = try! NSJSONSerialization.dataWithJSONObject(json, options: [])
+        
         // Basic Authorization
         let loginString =  NSString(format: "%@:%@", username, password)
         let loginData: NSData = loginString.dataUsingEncoding(NSUTF8StringEncoding)!
@@ -130,7 +148,7 @@ class NetworkHandler {
         // Excute HTTP Request
         let task = NSURLSession.sharedSession().dataTaskWithRequest(myRequest) { data, response, error in
             
-            dispatch_async(dispatch_get_main_queue()) {
+            dispatch_async(dispatch_get_main_queue( )) {
                 if data != nil {
                     completionHandler(data, nil)
                 }else {
@@ -138,7 +156,6 @@ class NetworkHandler {
                     return
                 }
             }
-            
         }
         
         task.resume();

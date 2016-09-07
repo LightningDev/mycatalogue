@@ -20,7 +20,6 @@ extension UIImageView {
                 print(error)
             }
         }
-        
     }
 }
 
@@ -38,5 +37,15 @@ extension String {
         let start = startIndex.advancedBy(r.startIndex)
         let end = start.advancedBy(r.endIndex - r.startIndex)
         return self[Range(start ..< end)]
+    }
+    
+    func toBool() -> Bool {
+        return (self == "1") ? true : false
+    }
+}
+
+extension Bool {
+    func toInt() -> Int {
+        return (self == true) ? 1 : 0
     }
 }

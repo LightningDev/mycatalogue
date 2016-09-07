@@ -13,12 +13,25 @@ class MainMenu: UIViewController {
     
     // Properties
     @IBOutlet var syncButton: UIBarButtonItem!
+    @IBOutlet var accountButton: UIButton!
+    @IBOutlet var saleButton: UIButton!
+    @IBOutlet var catalogueButton: UIButton!
+    @IBOutlet var savedButton: UIButton!
+    
     var numDownloads: Int = 0
     var numItems: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        // User account
+        let userAccount = BackgroundFunctions.getCurrentUser()
+        let permission = userAccount.permission
+        
+        accountButton.enabled = String(permission[Permission.CONTACTS.rawValue]).toBool()
+        catalogueButton.enabled = String(permission[Permission.CATALOGUE.rawValue]).toBool()
+        saleButton.enabled = String(permission[Permission.SALES_ORDERS.rawValue]).toBool()
+        savedButton.enabled = String(permission[Permission.SAVED_ORDERS.rawValue]).toBool()
     }
     
     override func didReceiveMemoryWarning() {
@@ -31,104 +44,43 @@ class MainMenu: UIViewController {
         
     }
     
-    @IBAction func accountsBtn(sender: UIButton) {
-        
-        
-    }
-    
-    @IBAction func catalogueBtn(sender: UIButton) {
-        
-    }
-    
-    @IBAction func salesBtn(sender: UIButton) {
-        
-        
-    }
-    
     @IBAction func syncBtn(sender: UIBarButtonItem) {
         
         // download database
         BackgroundFunctions.cleanDatabase()
         //loadMaterialGroups()
         
+//        // Catalogue
         let catalogue = Catalogue()
         catalogue.downloadFromServer()
+        //catalogue.downloadSubMaterialGroup()
+//
+//        // Contact
+//        let contacts = ContactInformation()
+//        contacts.downloadContact()
+//        
+//        let downloadManager = DownloadManager()
+//        let api = dispatch_group_create()
+//        downloadManager.downloadAllCatalogue(api)
+//        dispatch_group_notify(api, dispatch_get_main_queue()) {
+//            downloadManager.importMaterialToRealm()
+//        }
+        
+        // Sale order
+        let sales = SalesOrders()
+        sales.downloadSalesOrder()
+        
+        // Contact
+        let contacts = ContactInformation()
+        contacts.downloadContact()
+        
         
     }
     
-    // Functions
-    
-    // Get material groups from server
-    func loadMaterialGroups() {
-        let group = dispatch_group_create()
-        let url: String = "http://192.168.222.113:8000/api/matgroup"
-        let username = "OPTO"
-        let password = "opto"
-        let networkHandler = NetworkHandler(endPointUrl: url, username: username, password: password)
-        dispatch_group_enter(group)
-        networkHandler.sendGetRequest("", parameters: "") { response, error in
-            if response != nil {
-                let dict: NSDictionary = networkHandler.convertToDict(response!)
-                
-                let jsonArr  = dict["_embedded"]!["item"] as! NSArray
-                let jsonCnt: Int = jsonArr.count
-                self.numItems = jsonCnt
-                for i in 0..<jsonCnt {
-                    let item = jsonArr[i]
-                    let matGroup = MaterialGroups()
-                    matGroup.code = String(item["code"]!!)
-                    matGroup.desc = String(item["description"]!!)
-                    //self.loadCatalogueList(matGroup)
-                }
-                self.numItems = jsonCnt
-                print("all downloaded")
-                dispatch_group_leave(group)
-            }else {
-                print(error)
-                return
-            }
-        }
-        
-        dispatch_group_notify(group, dispatch_get_main_queue()) {
-            print("request done \(self.numItems)")
-        }
-    }
-    
-    func loadCatalogueList(matGroup: MaterialGroups) {
-        let url: String = "http://192.168.222.113:8000/api/matgroup/" + matGroup.code
-        let username = "OPTO"
-        let password = "opto"
-        let networkHandler = NetworkHandler(endPointUrl: url, username: username, password: password)
-        networkHandler.sendGetRequest("", parameters: "") { response, error in
-            if response != nil {
-                let dict: NSDictionary = networkHandler.convertToDict(response!, checkCode: matGroup.code)
-                if (dict.count == 0 ) {
-                    print("Ignored \(matGroup.code) because of unexpected characters")
-                    return
-                }
-                let jsonArr  = dict["_embedded"]!["materials"] as! NSArray
-                let jsonCnt: Int = jsonArr.count
-                for i in 0..<jsonCnt {
-                    let item = jsonArr[i]
-                    let matItem = Materials() 
-                    matItem.code = String(item["material_code"]!!)
-                    matItem.desc = String(item["description"]!!)
-                    matItem.path = String(item["path"]!!)
-                    matItem.stock = Double(String(item["stock"]!!))!
-                    matGroup.materials.append(matItem)
-                    BackgroundFunctions.insertRow(matItem)
-                }
-                BackgroundFunctions.insertRow(matGroup)
-                print("Downloaded \(matGroup.code)")
-                //BackgroundFunctions.modifyRow(matGroup)
-            }else {
-                print(error)
-                return
-            }
-        }
-    }
-    
+    @IBAction func loginButton(sender: UIBarButtonItem) {
 
+    }
+    
     
 }
 

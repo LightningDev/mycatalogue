@@ -19,6 +19,9 @@ class SalesScreen: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     var delegate: SalesScreenDelegate? = nil
     
+    // Online - Unstable
+    let checkOnline = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -34,12 +37,23 @@ class SalesScreen: UIViewController {
     
     // Actions
     @IBAction func refreshSalesList() {
-        let group = dispatch_group_create()
-        self.saleOrderList.importSales(group)
-        dispatch_group_notify(group, dispatch_get_main_queue()) {
-            self.saleOrderList.setupDictionary()
-            self.tableView.reloadData()
+        if (checkOnline) {
+            let group = dispatch_group_create()
+            self.saleOrderList.importSales(group)
+            dispatch_group_notify(group, dispatch_get_main_queue()) {
+                self.saleOrderList.setupDictionary()
+                self.tableView.reloadData()
+            }
+        } else {
+            readSalesOrderLocal()
         }
+    }
+    
+    func readSalesOrderLocal() {
+        saleOrderList.getFromRealm()
+        saleOrderList.sortAlphaIndex()
+        self.saleOrderList.setupDictionary()
+        self.tableView.reloadData()
     }
     
     @IBAction func goBackHome() {
@@ -73,7 +87,8 @@ extension SalesScreen: UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         //print(self.saleOrderList.alphaIndex.count)
-        return self.saleOrderList.alphaIndex.count
+        let cnt = self.saleOrderList.alphaIndex.count
+        return cnt
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

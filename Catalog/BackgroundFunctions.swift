@@ -11,6 +11,27 @@ import RealmSwift
 
 public class BackgroundFunctions {
     
+    static var currentUser = Employees()
+    
+    static var defaultClient = Contacts()
+    
+    class func setdefaultClient(user: Contacts) {
+        defaultClient = user
+    }
+    
+    class func getdefaultClient() -> Contacts {
+        return defaultClient
+    }
+    
+    
+    class func setCurrentUser(user: Employees) {
+        currentUser = user
+    }
+    
+    class func getCurrentUser() -> Employees {
+        return currentUser
+    }
+    
     class func isConnectedToNetwork() -> Bool {
         
         var zeroAddress = sockaddr_in()
@@ -42,7 +63,6 @@ public class BackgroundFunctions {
         try! realm.write {
             realm.add(object)
         }
-        
     }
     
     class func modifyRow(object: Object) {
@@ -53,21 +73,29 @@ public class BackgroundFunctions {
         }
     }
     
-    class func deleteRow() {
+    class func deleteRow(object: Object) {
+        mitigrateRealm()
         let realm = try! Realm()
+        try! realm.write {
+            realm.delete(object)
+        }
+    }
+    
+    class func updateRow() {
+        
     }
     
     class func mitigrateRealm() {
         let config = Realm.Configuration(
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
-            schemaVersion: 4,
+            schemaVersion: 18,
             
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
                 // We haven’t migrated anything yet, so oldSchemaVersion == 0
-                if (oldSchemaVersion < 4) {
+                if (oldSchemaVersion < 18) {
                     // Nothing to do!
                     // Realm will automatically detect new properties and removed properties
                     // And will update the schema on disk automatically

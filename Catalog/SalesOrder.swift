@@ -6,6 +6,7 @@
 //  Copyright © 2016 iTMS. All rights reserved.
 //
 
+import Foundation
 import RealmSwift
 
 class SalesOrder: Object {

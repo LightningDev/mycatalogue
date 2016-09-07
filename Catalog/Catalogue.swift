@@ -21,6 +21,9 @@ class Catalogue {
     var countGroup: Int {
         return materialGroups.count
     }
+    var countSubGroup: Int {
+        return subMaterialGroups.count
+    }
     
     // Sub Material
     
@@ -59,7 +62,7 @@ class Catalogue {
                 let jsonArr  = dict["_embedded"]!["item"] as! NSArray
                 let jsonCnt: Int = jsonArr.count
                 for i in 0..<jsonCnt {
-                    var materialGroup = MaterialGroups()
+                    let materialGroup = MaterialGroups()
                     let item = jsonArr[i]
                     materialGroup.code = String(item["code"]!!)
                     materialGroup.desc = String(item["description"]!!)
@@ -68,6 +71,135 @@ class Catalogue {
                 if (apiRequest != nil) {
                     dispatch_group_leave(apiRequest!)
                 }
+            }else {
+                print(error)
+                return
+            }
+        }
+    }
+    
+    // download submaterialgroup
+    func importSubMaterialGroup(apiGroup: dispatch_group_t) {
+        // Declare api header
+        let url: String = NetworkList.Address.rawValue + NetworkList.SubMaterialGroupAddress.rawValue
+        let username = NetworkList.Username.rawValue
+        let password = NetworkList.Password.rawValue
+        let networkHandler = NetworkHandler(endPointUrl: url, username: username, password: password)
+        self.subMaterialGroups.removeAll()
+        // Call it
+        dispatch_group_enter(apiGroup)
+        networkHandler.sendGetRequest("", parameters: "") { response, error in
+            if response != nil {
+                let dict: NSDictionary = networkHandler.convertToDict(response!)
+                
+                let jsonArr  = dict["_embedded"]!["item"] as! NSArray
+                let jsonCnt: Int = jsonArr.count
+                for i in 0..<jsonCnt {
+                    let item = jsonArr[i]
+                    
+                    // test
+                    let materialGroup = SubMaterialGroups()
+                    materialGroup.code = String(item["code"]!!)
+                    materialGroup.desc = String(item["description"]!!)
+                    self.subMaterialGroups.append(materialGroup)
+                    
+                }
+                dispatch_group_leave(apiGroup)
+            }else {
+                print(error)
+                return
+            }
+        }
+        
+        // Notify asynchronous completion
+        dispatch_group_notify(apiGroup, dispatch_get_main_queue()) {
+            //print("Start downloading sub material")
+            let group = dispatch_group_create()
+            
+            for i in 0..<self.countSubGroup {
+                self.downloadItemInSubMaterialGroup(self.subMaterialGroups[i].code, index: i, apiRequest: group)
+            }
+        }
+    }
+    
+    // download submaterialgroup
+    func downloadSubMaterialGroup() {
+        // Declare api header
+        let apiGroup = dispatch_group_create()
+        let url: String = NetworkList.Address.rawValue + NetworkList.SubMaterialGroupAddress.rawValue
+        let username = NetworkList.Username.rawValue
+        let password = NetworkList.Password.rawValue
+        let networkHandler = NetworkHandler(endPointUrl: url, username: username, password: password)
+        self.subMaterialGroups.removeAll()
+        // Call it
+        dispatch_group_enter(apiGroup)
+        networkHandler.sendGetRequest("", parameters: "") { response, error in
+            if response != nil {
+                let dict: NSDictionary = networkHandler.convertToDict(response!)
+                
+                let jsonArr  = dict["_embedded"]!["item"] as! NSArray
+                let jsonCnt: Int = jsonArr.count
+                for i in 0..<jsonCnt {
+                    let item = jsonArr[i]
+                    
+                    // test
+                    let materialGroup = SubMaterialGroups()
+                    materialGroup.code = String(item["code"]!!)
+                    materialGroup.desc = String(item["description"]!!)
+                    self.subMaterialGroups.append(materialGroup)
+                    
+                }
+                dispatch_group_leave(apiGroup)
+            }else {
+                print(error)
+                return
+            }
+        }
+        
+        // Notify asynchronous completion
+        dispatch_group_notify(apiGroup, dispatch_get_main_queue()) {
+            //print("Start downloading sub material")
+            let fuckingapigroup = dispatch_group_create()
+            
+            for i in 0..<self.countSubGroup {
+                self.downloadItemInSubMaterialGroup(self.subMaterialGroups[i].code, index: i, apiRequest: fuckingapigroup)
+            }
+            
+            dispatch_group_notify(fuckingapigroup, dispatch_get_main_queue()) {
+                self.writeToRealmSub()
+            }
+        }
+    }
+    
+    func downloadItemInSubMaterialGroup(code: String, index: Int, apiRequest: dispatch_group_t) {
+        // Declare api header
+        let url: String = NetworkList.Address.rawValue + NetworkList.SubMaterialGroupAddress.rawValue + "/" + code
+        let username = NetworkList.Username.rawValue
+        let password = NetworkList.Password.rawValue
+        let networkHandler = NetworkHandler(endPointUrl: url, username: username, password: password)
+        // Call it
+        dispatch_group_enter(apiRequest)
+        networkHandler.sendGetRequest("", parameters: "") { response, error in
+            if response != nil {
+                let dict: NSDictionary = networkHandler.convertToDict(response!, checkCode: code)
+                if (dict.count == 0 ) {
+                    return
+                }
+                let jsonArr  = dict["_embedded"]!["materials"] as! NSArray
+                let jsonCnt: Int = jsonArr.count
+                for i in 0..<jsonCnt {
+                    let item = jsonArr[i]
+                    let testItem = Materials()
+                    testItem.code = String(item["material_code"]!!)
+                    testItem.desc = String(item["description"]!!)
+                    testItem.stock = Double(String(item["stock"]!!))!
+                    testItem.path = String(item["path"]!!)
+                    if (String(item["cash_p_m"]!!) != "<null>") {
+                        testItem.cash_p_m = Double(String(item["cash_p_m"]!!))!
+                    }
+                    self.subMaterialGroups[index].materials.append(testItem)
+                }
+                dispatch_group_leave(apiRequest)
             }else {
                 print(error)
                 return
@@ -101,6 +233,9 @@ class Catalogue {
                     testItem.desc = String(item["description"]!!)
                     testItem.stock = Double(String(item["stock"]!!))!
                     testItem.path = String(item["path"]!!)
+                    if (String(item["cash_p_m"]!!) != "<null>") {
+                        testItem.cash_p_m = Double(String(item["cash_p_m"]!!))!
+                    }
                     self.materialGroups[index].materials.append(testItem)
                 }
                 //print("Check this code mate \(code)")
@@ -118,10 +253,11 @@ class Catalogue {
     private func downloadMaterialGroup() {
         // Declare api header
         let group = dispatch_group_create()
-        let url: String = NetworkList.Address.rawValue + NetworkList.offline.rawValue
+        let url: String = NetworkList.Address.rawValue + NetworkList.MatgroupAddress.rawValue
         let username = NetworkList.Username.rawValue
         let password = NetworkList.Password.rawValue
         let networkHandler = NetworkHandler(endPointUrl: url, username: username, password: password)
+        self.materialGroups.removeAll()
         // Call it
         dispatch_group_enter(group)
         networkHandler.sendGetRequest("", parameters: "") { response, error in
@@ -134,7 +270,7 @@ class Catalogue {
                     let item = jsonArr[i]
                     
                     // test
-                    var materialGroup = MaterialGroups()
+                    let materialGroup = MaterialGroups()
                     materialGroup.code = String(item["code"]!!)
                     materialGroup.desc = String(item["description"]!!)
                     self.materialGroups.append(materialGroup)
@@ -157,9 +293,7 @@ class Catalogue {
             
             // Notify asynchronous completion
             dispatch_group_notify(apiGroup, dispatch_get_main_queue()) {
-                print("Finished all")
-                BackgroundFunctions.createDirectory()
-                self.downloadImage()
+                self.writeToRealm()
             }
         }
     }
@@ -167,7 +301,7 @@ class Catalogue {
     // Download sub material
     private func downloadSubMaterial(code: String, index: Int, apiGroup: dispatch_group_t) {
         // Declare api header
-        let url: String = NetworkList.Address.rawValue + NetworkList.offline.rawValue + "/" + code
+        let url: String = NetworkList.Address.rawValue + NetworkList.MatgroupAddress.rawValue + "/" + code
         let username = NetworkList.Username.rawValue
         let password = NetworkList.Password.rawValue
         let networkHandler = NetworkHandler(endPointUrl: url, username: username, password: password)
@@ -191,7 +325,10 @@ class Catalogue {
                     testItem.code = String(item["material_code"]!!)
                     testItem.desc = String(item["description"]!!)
                     testItem.stock = Double(String(item["stock"]!!))!
-                    testItem.path = BackgroundFunctions.getImageDirectory().URLByAppendingPathComponent("image.jpg").path!
+                    //testItem.path = BackgroundFunctions.getImageDirectory().URLByAppendingPathComponent("image.jpg").path!
+                    if (String(item["cash_p_m"]!!) != "<null>") {
+                        testItem.cash_p_m = Double(String(item["cash_p_m"]!!))!
+                    }
                     self.materialGroups[index].materials.append(testItem)
                 }
                 print("Current checkCount of \(code)")
@@ -200,44 +337,6 @@ class Catalogue {
                 print(error)
                 return
             }
-        }
-    }
-    
-    // download submaterialgroup
-    func downloadSubMaterialGroup(code: String, index: Int, apiGroup: dispatch_group_t) {
-        // Declare api header
-        let group = dispatch_group_create()
-        let url: String = NetworkList.Address.rawValue + NetworkList.SubMaterialGroupAddress.rawValue
-        let username = NetworkList.Username.rawValue
-        let password = NetworkList.Password.rawValue
-        let networkHandler = NetworkHandler(endPointUrl: url, username: username, password: password)
-        // Call it
-        dispatch_group_enter(group)
-        networkHandler.sendGetRequest("", parameters: "") { response, error in
-            if response != nil {
-                let dict: NSDictionary = networkHandler.convertToDict(response!)
-                
-                let jsonArr  = dict["_embedded"]!["item"] as! NSArray
-                let jsonCnt: Int = jsonArr.count
-                for i in 0..<jsonCnt {
-                    let item = jsonArr[i]
-                    
-                    // test
-                    var materialGroup = SubMaterialGroups()
-                    materialGroup.code = String(item["code"]!!)
-                    materialGroup.desc = String(item["description"]!!)
-                    self.subMaterialGroups.append(materialGroup)
-                }
-                dispatch_group_leave(group)
-            }else {
-                print(error)
-                return
-            }
-        }
-        
-        dispatch_group_notify(group, dispatch_get_main_queue()) {
-            // Get the material in sub group
-            
         }
     }
     
@@ -270,5 +369,18 @@ class Catalogue {
             self.finish = true
         }
         
+    }
+    
+    func writeToRealm() {
+        for i in 0..<self.countGroup {
+            BackgroundFunctions.insertRow(self.materialGroups[i])
+        }
+    }
+    
+    func writeToRealmSub() {
+        for i in 0..<self.countSubGroup {
+            print(self.subMaterialGroups[i].code)
+            BackgroundFunctions.insertRow(self.subMaterialGroups[i])
+        }
     }
 }

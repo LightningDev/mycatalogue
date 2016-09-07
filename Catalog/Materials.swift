@@ -14,6 +14,7 @@ class Materials: Object {
     dynamic var desc: String?
     dynamic var path: String?
     dynamic var stock: Double = 0.0
+    dynamic var cash_p_m: Double = 0.0
     dynamic var image = NSData()
     
     override static func indexedProperties() -> [String] {

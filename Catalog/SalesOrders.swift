@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import RealmSwift
 
 class SalesOrders {
     
@@ -17,6 +18,13 @@ class SalesOrders {
     init() {
         self.alphaSalesOrders = [String: [SalesOrder]]()
         //setupDictionary()
+    }
+    
+    func getFromRealm() {
+        BackgroundFunctions.mitigrateRealm()
+        let realm = try! Realm()
+        let results: Results<SalesOrder> = realm.objects(SalesOrder.self)
+        self.salesOrders = Array(results)
     }
     
     // Request sales from API
@@ -79,15 +87,28 @@ class SalesOrders {
         }
     }
     
+    func sortAlphaIndex() {
+        for i in 0..<salesOrders.count {
+            let sale = salesOrders[i]
+            if (!self.alphaIndex.contains(sale.customer)) {
+                self.alphaIndex.append(sale.customer)
+                self.alphaSalesOrders[sale.customer] = [SalesOrder]()
+            }
+        }
+ 
+    }
+    
     // Import to Realm
-    func downloadContact() {
-//        let apiRequest = dispatch_group_create()
-//        importContact(apiRequest)
-//        dispatch_group_notify(apiRequest, dispatch_get_main_queue()) {
-//            for i in 0..<self.contacts.count {
-//                BackgroundFunctions.insertRow(self.contacts[i])
-//            }
-//        }
+    func downloadSalesOrder() {
+        let apiRequest = dispatch_group_create()
+        importSales(apiRequest)
+        dispatch_group_notify(apiRequest, dispatch_get_main_queue()) {
+            let cnt = self.salesOrders.count
+            for i in 0..<cnt {
+                BackgroundFunctions.insertRow(self.salesOrders[i])
+                print("Import Sale \(i)/\(cnt)")
+            }
+        }
     }
     
 }
