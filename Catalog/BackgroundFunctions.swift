@@ -15,6 +15,10 @@ public class BackgroundFunctions {
     
     static var defaultClient = Contacts()
     
+    static var continueCustomer = ""
+    
+    static var switchOff: Bool = false
+    
     class func setdefaultClient(user: Contacts) {
         defaultClient = user
     }
@@ -31,6 +35,7 @@ public class BackgroundFunctions {
     class func getCurrentUser() -> Employees {
         return currentUser
     }
+    
     
     class func isConnectedToNetwork() -> Bool {
         

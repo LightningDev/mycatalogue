@@ -27,11 +27,7 @@ class MainMenu: UIViewController {
         // User account
         let userAccount = BackgroundFunctions.getCurrentUser()
         let permission = userAccount.permission
-        
-        accountButton.enabled = String(permission[Permission.CONTACTS.rawValue]).toBool()
-        catalogueButton.enabled = String(permission[Permission.CATALOGUE.rawValue]).toBool()
-        saleButton.enabled = String(permission[Permission.SALES_ORDERS.rawValue]).toBool()
-        savedButton.enabled = String(permission[Permission.SAVED_ORDERS.rawValue]).toBool()
+
     }
     
     override func didReceiveMemoryWarning() {

@@ -73,4 +73,17 @@ class SalesDetails {
             }
         }
     }
+    
+    // download sales order
+//    func downloadSalesOrder() {
+//        let apiRequest = dispatch_group_create()
+//        importSales(apiRequest)
+//        dispatch_group_notify(apiRequest, dispatch_get_main_queue()) {
+//            let cnt = self.salesOrders.count
+//            for i in 0..<cnt {
+//                BackgroundFunctions.insertRow(self.salesOrders[i])
+//                print("Import Sale \(i)/\(cnt)")
+//            }
+//        }
+//    }
 }

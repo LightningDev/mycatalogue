@@ -60,12 +60,17 @@ class SavedOrderDetailViewController: UIViewController, UITableViewDataSource, U
         }
     }
     
+    @IBAction func goToCat(sender: UIBarButtonItem) {
+        tabBarController?.selectedIndex = 1
+        BackgroundFunctions.continueCustomer = cart.user
+        BackgroundFunctions.switchOff = true
+    }
+    
     func setSavedOrderDetail(saveCart: CatalogueCart) {
         cart = saveCart
         saveButton.enabled = !cart.finished
         addButton.enabled = true
         sendButton.enabled = true
-        totalLabel.text = String(cart.cart_total_price)
         self.collection.reloadData()
     }
 

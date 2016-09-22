@@ -91,7 +91,7 @@ public class AsynchronousOperation : NSOperation {
     
     private var _executing: Bool = false
     
-    var operationStarted: Bool = false
+    var operationStarted: Bool = false // flag operationStarted here
     
     override private(set) public var executing: Bool {
         get {
@@ -122,6 +122,7 @@ public class AsynchronousOperation : NSOperation {
     
     public func completeOperation() {
         
+        // Check the flag
         if (!operationStarted) {
             return
         }
@@ -136,7 +137,7 @@ public class AsynchronousOperation : NSOperation {
     }
     
     override public func start() {
-        operationStarted = true
+        operationStarted = true // turn it on
         if cancelled {
             finished = true
             return

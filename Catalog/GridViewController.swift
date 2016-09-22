@@ -67,12 +67,12 @@ class GridViewController : UICollectionViewFlowLayout {
                 let currentLayoutAttributes = attributesCopy[i]
                 let prevLayoutAttributes = attributesCopy[i - 1]
                 let maximumSpacing = CGFloat(0)
-                let origin = CGRectGetMaxX(prevLayoutAttributes.frame)
-                print("\(origin) + \(maximumSpacing) + \(currentLayoutAttributes.frame.size.width)")
-                print(self.collectionViewContentSize())
-                if (origin + maximumSpacing + currentLayoutAttributes.frame.size.width < self.collectionViewContentSize().height) {
+                let origin = CGRectGetMaxY(prevLayoutAttributes.frame)
+//                print("\(origin) + \(maximumSpacing) + \(currentLayoutAttributes.frame.size.width)")
+//                print(self.collectionViewContentSize())
+                if (origin + maximumSpacing + currentLayoutAttributes.frame.size.height < self.collectionViewContentSize().height) {
                     var frame = currentLayoutAttributes.frame
-                    frame.origin.x = origin + maximumSpacing
+                    frame.origin.y = origin + maximumSpacing
                     currentLayoutAttributes.frame = frame
                 }
             }

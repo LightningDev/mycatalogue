@@ -115,4 +115,12 @@ class ContactInformation {
         }
     }
     
+    func toCodeArray() -> [String] {
+        var returnString = [String]()
+        for i in 0..<contacts.count {
+            returnString.append(contacts[i].code)
+        }
+        
+        return returnString
+    }
 }

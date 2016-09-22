@@ -15,19 +15,19 @@ class NetworkManager: NSObject, NSURLSessionTaskDelegate, NSURLSessionDownloadDe
     private var operations = [Int: NetworkOperation]()
     
     /// Single or multiple dispatch
-    
+
     var waitForAll: Bool = true
-    
+
     /// Multiple dispatchs in each operation
-    
+
     var apiGroups = [Int: dispatch_group_t]()
-    
+
     /// Dictionary of leave dispatchs
-    
+
     var leaveGroups = [Int: Bool]()
-    
+
     /// Single dispatchs for all operations
-    
+
     var api = dispatch_group_create()
     
     /// OPTIONAL: images data after downloading
@@ -62,7 +62,7 @@ class NetworkManager: NSObject, NSURLSessionTaskDelegate, NSURLSessionDownloadDe
     /// - parameter URL:  The URL of the file to be downloaded
     ///
     /// - returns:        The NetworkOperation of the operation that was queued
-    
+
     func addDownload(URL: NSURL) -> NetworkOperation {
         let operation = NetworkOperation(session: session, URL: URL)
         operations[operation.task.taskIdentifier] = operation
@@ -96,7 +96,7 @@ class NetworkManager: NSObject, NSURLSessionTaskDelegate, NSURLSessionDownloadDe
         }
         queue.cancelAllOperations()
     }
-    
+
     // Use with !WaitForAll
     func checkAllOperationsWereDone() -> Bool {
         for i in 0..<leaveGroups.count {
@@ -108,7 +108,7 @@ class NetworkManager: NSObject, NSURLSessionTaskDelegate, NSURLSessionDownloadDe
     }
     
     // MARK: NSURLSessionDownloadDelegate methods
-    
+
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
         operations[downloadTask.taskIdentifier]?.URLSession(session, downloadTask: downloadTask, didFinishDownloadingToURL: location)
         if (waitForAll) {
@@ -123,7 +123,6 @@ class NetworkManager: NSObject, NSURLSessionTaskDelegate, NSURLSessionDownloadDe
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         downloadPercentage = (operations[downloadTask.taskIdentifier]?.URLSession(session, downloadTask: downloadTask, didWriteData: bytesWritten, totalBytesWritten: totalBytesWritten, totalBytesExpectedToWrite: totalBytesExpectedToWrite))!
         let percentage = Float(downloadPercentage)
-        print(downloadPercentage)
         dispatch_async(dispatch_get_main_queue()) {
             self.delegate?.setProgressViewController(percentage!)
         }

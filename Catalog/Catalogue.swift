@@ -18,6 +18,7 @@ class Catalogue {
     // Material group
     var materialGroups = [MaterialGroups]()
     var subMaterialGroups = [SubMaterialGroups]()
+    var materials = [Materials]()
     var countGroup: Int {
         return materialGroups.count
     }
@@ -42,6 +43,21 @@ class Catalogue {
         let realm = try! Realm()
         let results: Results<MaterialGroups> = realm.objects(MaterialGroups.self)
         self.materialGroups = Array(results)
+    }
+    
+    func getSubFromRealm() {
+        BackgroundFunctions.mitigrateRealm()
+        let realm = try! Realm()
+        let results: Results<SubMaterialGroups> = realm.objects(SubMaterialGroups.self)
+        self.subMaterialGroups = Array(results)
+    }
+    
+    // Get all materials
+    func getAllFromRealm() {
+        BackgroundFunctions.mitigrateRealm()
+        let realm = try! Realm()
+        let results: Results<Materials> = realm.objects(Materials.self)
+        self.materials = Array(results)
     }
     
     func importMaterial(apiRequest: dispatch_group_t? = nil) {
@@ -382,5 +398,49 @@ class Catalogue {
             print(self.subMaterialGroups[i].code)
             BackgroundFunctions.insertRow(self.subMaterialGroups[i])
         }
+    }
+    
+    func toGroupNameArray() -> [String] {
+        var returnString = [String]()
+        for i in 0..<self.countGroup {
+            returnString.append(materialGroups[i].desc!)
+        }
+        
+        return returnString
+    }
+    
+    func toSubGroupNameArray() -> [String] {
+        var returnString = [String]()
+        for i in 0..<self.countSubGroup {
+            returnString.append(subMaterialGroups[i].desc!)
+        }
+        
+        return returnString
+    }
+    
+    func filterMaterials(searchText: String) -> [Materials]{
+        var matTuples: [(code:String , desc: String)] = []
+        var returnMat = [Materials]()
+        for i in 0..<materials.count {
+            matTuples += [(code:materials[i].code, desc:materials[i].desc!)]
+        }
+        
+        let filtered = matTuples.filter({ (data) -> Bool in
+            let codeSearch: NSString = data.code // the name from the variable decleration
+            let descSearch: NSString = data.desc // the name from the variable decleration
+            let codeSearchRange = codeSearch.rangeOfString(searchText, options: NSStringCompareOptions.CaseInsensitiveSearch)
+            let descSearchRange = descSearch.rangeOfString(searchText, options: NSStringCompareOptions.CaseInsensitiveSearch)
+            return (codeSearchRange.location != NSNotFound || descSearchRange.location != NSNotFound)
+        })
+        
+        print(filtered.count)
+        return returnMat
+    }
+    
+    func forTheFuckSakeFilter(searchText: String) -> [Materials] {
+        BackgroundFunctions.mitigrateRealm()
+        let realm = try! Realm()
+        let someDogs = realm.objects(Materials.self).filter("code contains '\(searchText)'")
+        return Array(someDogs)
     }
 }

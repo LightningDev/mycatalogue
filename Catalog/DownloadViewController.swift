@@ -44,7 +44,7 @@ class DownloadViewController: UIViewController {
     
     func downloadImages() {
         let urlStrings = [
-            "http://192.168.222.116:8000/images/images.zip"
+            "http://192.168.222.114:8000/images/images.zip"
         ]
         let urls = urlStrings.map { NSURL(string: $0)! }
         

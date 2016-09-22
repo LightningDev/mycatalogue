@@ -8,10 +8,12 @@
 
 import UIKit
 import RealmSwift
+import ActionSheetPicker_3_0
 
 enum PageOption: String {
     case MATERIAL_GROUP = "MaterialGroup"
     case SUB_MATERIAL_GROUP = "SubMaterialGroup"
+    case ALL = "all"
 }
 
 class CatalogueScreens: UIViewController {
@@ -23,10 +25,12 @@ class CatalogueScreens: UIViewController {
     var checkConnection: Bool = false
     @IBOutlet weak var choiceMat: UISegmentedControl!
     var selectedOption: PageOption {
-        if (self.choiceMat.selectedSegmentIndex == 0) {
+        if (self.choiceMat.selectedSegmentIndex == 1) {
             return .MATERIAL_GROUP
-        } else {
+        } else if (self.choiceMat.selectedSegmentIndex == 2) {
             return .SUB_MATERIAL_GROUP
+        } else {
+            return .ALL
         }
     }
     
@@ -39,6 +43,7 @@ class CatalogueScreens: UIViewController {
     var numMatgroup: Int = 0
     var matgroupPickerData = [String]()
     var selectedItem: String?
+    var selectedRow = 0
     
     // CollectionView
     @IBOutlet var myCollection: UICollectionView!
@@ -54,12 +59,20 @@ class CatalogueScreens: UIViewController {
         return numCell/3
     }
     
+    var isSegue: Bool = true
+    
+    var filteredData: [Materials]!
+    
+    // Search bar
+    @IBOutlet weak var searchBar: UISearchBar!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.matgroupPickerView.dataSource = self
-        self.matgroupPickerView.delegate = self
-        self.matgroupView.alpha = 0.5
-        hidePickerView(true)
+        
+        if (selectedOption == .ALL) {
+            loadAllOfflineMat()
+        }
+        searchBar.delegate = self
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -80,92 +93,134 @@ class CatalogueScreens: UIViewController {
         }
     }
     
+    override func shouldPerformSegueWithIdentifier(identifier: String, sender: AnyObject!) -> Bool {
+        if identifier == "segueMatdetails" {
+            return isSegue
+        }
+        return true
+    }
+    
     @IBAction func increaseStock(sender: UIButton) {
         
     }
     
     @IBAction func choiceMatIndexChanged(sender: UISegmentedControl) {
-//        switch self.selectedOption
-//        {
-//        case .MATERIAL_GROUP:
-//            self.matgroupBarButton.title = "Material Group"
-//        case .SUB_MATERIAL_GROUP:
-//            self.matgroupBarButton.title = "Sub Material Group"
-//        }
+        switch self.selectedOption
+        {
+        case .MATERIAL_GROUP:
+            matgroupBarButton.enabled = true
+            loadAllGroup()
+        case .SUB_MATERIAL_GROUP:
+            matgroupBarButton.enabled = true
+            loadAllSubGroup()
+        case .ALL:
+            matgroupBarButton.enabled = false
+            loadAllOfflineMat()
+        }
     }
     
     @IBAction func goToCart(sender: UIButton) {
         
     }
     
+    // Load all offline material
+    func loadAllOfflineMat() {
+        catalogue.getAllFromRealm()
+        filteredData = catalogue.materials
+        numCell = filteredData.count
+        myCollection.reloadData()
+    }
+    
+    // Load all offline group
+    func loadAllGroup() {
+        numCell = 0
+        myCollection.reloadData()
+    }
+    
+    // Load all sub group
+    func loadAllSubGroup() {
+        numCell = 0
+        myCollection.reloadData()
+    }
+    
     // Load material groups
-    func chooseMatGroup() {
+    func chooseMatGroup(sender: UIBarButtonItem) {
         if (checkConnection) {
             // Send API request to get data
             let apiRequest = dispatch_group_create()
             self.catalogue.importMaterial(apiRequest)
             dispatch_group_notify(apiRequest, dispatch_get_main_queue()) {
-                self.hidePickerView(false)
-                self.matgroupPickerView.reloadAllComponents()
+                let names = self.catalogue.toGroupNameArray()
+                self.pickerViewShow(names, sender: sender)
             }
         } else {
             // Query from Realm
             BackgroundFunctions.mitigrateRealm()
             catalogue.getFromRealm()
-            self.hidePickerView(false)
-            self.matgroupPickerView.reloadAllComponents()
+            let names = catalogue.toGroupNameArray()
+            pickerViewShow(names, sender: sender)
         }
     }
     
-    func chooseSubMatGroup() {
+    func chooseSubMatGroup(sender: UIBarButtonItem) {
         if (checkConnection) {
             // Send API request to get data
             let apiRequest = dispatch_group_create()
             self.catalogue.importSubMaterialGroup(apiRequest)
             dispatch_group_notify(apiRequest, dispatch_get_main_queue()) {
-                //print("done submatgrou[")
-                self.hidePickerView(false)
-                self.matgroupPickerView.reloadAllComponents()
+                let names = self.catalogue.toSubGroupNameArray()
+                self.pickerViewShow(names, sender: sender)
             }
         } else {
             // Query from Realm
             BackgroundFunctions.mitigrateRealm()
             catalogue.getFromRealm()
-            self.hidePickerView(false)
-            self.matgroupPickerView.reloadAllComponents()
+            let names = catalogue.toSubGroupNameArray()
+            pickerViewShow(names, sender: sender)
         }
+    }
+    
+    func pickerViewShow(string: [String], sender: AnyObject?) {
+        //print(string)
+        ActionSheetMultipleStringPicker.showPickerWithTitle("Pick a group", rows: [
+            string
+            ], initialSelection: [1], doneBlock: {
+                picker, values, indexes in
+                let number = values[0]
+                self.selectMatgroupButton(Int(number as! NSNumber))
+                self.selectedRow = Int(number as! NSNumber)
+                return
+            }, cancelBlock: { ActionMultipleStringCancelBlock in return }, origin: sender )
     }
     
     @IBAction func addPopover(sender: UIBarButtonItem) {
         if (self.selectedOption == .MATERIAL_GROUP) {
-            chooseMatGroup()
+            chooseMatGroup(sender)
         } else {
-            chooseSubMatGroup()
+            chooseSubMatGroup(sender)
         }
     }
     
     // Select mat group from picker view
-    @IBAction func selectMatgroupButton(sender: UIButton) {
-        let selectedRow = self.matgroupPickerView.selectedRowInComponent(0)
+    func selectMatgroupButton(index: Int) {
         //self.selectedItem = self.matgroupPickerData[selectedRow]
-        if ((selectedRow) >= 0 ) {
-            let mgCode = self.catalogue.materialGroups[selectedRow].code
-            hidePickerView(true)
+        if ((index) >= 0 ) {
+            let mgCode = self.catalogue.materialGroups[index].code
             if (self.numCell > 0) {
                 self.numCell = 0
                 self.myCollection.reloadData()
             }
             if (checkConnection) {
                 let apiRequest = dispatch_group_create()
-                self.catalogue.importSubMaterial(mgCode, index: selectedRow, apiRequest: apiRequest)
+                self.catalogue.importSubMaterial(mgCode, index: index, apiRequest: apiRequest)
                 dispatch_group_notify(apiRequest, dispatch_get_main_queue()) {
                     //self.catalogue.downloadImage()
-                    self.numCell = self.catalogue.materialGroups[selectedRow].materials.count
+                    self.numCell = self.catalogue.materialGroups[index].materials.count
                     self.myCollection.reloadData()
                 }
             } else {
                 // Query from Realm
-                self.numCell = self.catalogue.materialGroups[selectedRow].materials.count
+                self.numCell = self.catalogue.materialGroups[index].materials.count
                 self.myCollection.reloadData()
             }
         }
@@ -277,8 +332,12 @@ class CatalogueScreens: UIViewController {
 extension CatalogueScreens: CatalogueDetailsDelegate {
     func loadCatalogueDetails(controller: CatalogueDetails) {
         let cell = self.myCollection.cellForItemAtIndexPath(self.selectedCell) as! GridViewCell
-        let selectedRow = self.matgroupPickerView.selectedRowInComponent(0)
-        let price: Double = self.catalogue.materialGroups[selectedRow].materials[self.selectedCell.row].cash_p_m
+        var price = 0.0
+        if (selectedOption != .ALL) {
+            price = self.catalogue.materialGroups[selectedRow].materials[self.selectedCell.row].cash_p_m
+        } else {
+            price = catalogue.materials[selectedCell.row].cash_p_m
+        }
         let qty = cell.stockField.text
         controller.codeLabel.text = cell.codeLabel.text
         controller.descriptionTextView.text = cell.descLabel.text
@@ -287,42 +346,6 @@ extension CatalogueScreens: CatalogueDetailsDelegate {
         controller.imageView.image = cell.myImage.image
         controller.priceLabel.text = String(price)
         controller.totalPriceLabel.text = String(price * Double(qty!)!)
-    }
-}
-
-// MARK: - UIPickerViewDataSource
-extension CatalogueScreens: UIPickerViewDataSource {
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        //print("delegate numMatgroup=\(self.numMatgroup)")
-        var cnt = self.catalogue.countGroup
-        if (self.selectedOption == .SUB_MATERIAL_GROUP) {
-            cnt = self.catalogue.countSubGroup
-        }
-        //print("\(self.selectedOption) \(cnt)")
-        return cnt
-    }
-}
-
-// MARK: - UIPickerViewDelegate
-extension CatalogueScreens: UIPickerViewDelegate {
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        if (self.selectedOption == .SUB_MATERIAL_GROUP) {
-            return self.catalogue.subMaterialGroups[row].code
-        } else {
-            return self.catalogue.materialGroups[row].code
-        }
-    }
-    
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        if (self.selectedOption == .SUB_MATERIAL_GROUP) {
-            self.selectedItem = self.catalogue.subMaterialGroups[row].code
-        } else {
-            self.selectedItem = self.catalogue.materialGroups[row].code
-        }
     }
 }
 
@@ -350,6 +373,7 @@ extension CatalogueScreens: UICollectionViewDataSource {
     
     // tell the collection view how many cells to make
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        print(self.numCell)
         return self.numCell
     }
     
@@ -364,9 +388,7 @@ extension CatalogueScreens: UICollectionViewDataSource {
         if (self.numCell > 0 ) {
             if (self.selectedOption == .SUB_MATERIAL_GROUP) {
                 
-            } else {
-
-                let selectedRow = self.matgroupPickerView.selectedRowInComponent(0)
+            } else if (self.selectedOption == .MATERIAL_GROUP) {
                 
                 cell.codeLabel.text = self.catalogue.materialGroups[selectedRow].materials[indexPath.row].code
                 cell.descLabel.text = self.catalogue.materialGroups[selectedRow].materials[indexPath.row].desc
@@ -374,21 +396,20 @@ extension CatalogueScreens: UICollectionViewDataSource {
                 cell.stockField.tag = indexPath.row + 1
                 cell.plusButton.tag = indexPath.row + 1
                 cell.minusButton.tag = indexPath.row + 1
-//                if (!self.checkConnection) {
-//                    let imgPath = self.imageList[indexPath.row].path!
-//                    cell.myImage.image = UIImage(contentsOfFile: imgPath)
-//                } else {
-//                    //cell.myImage.downloadedFrom(self.imageList[indexPath.row])
-//                }
-                
-                // Test purpose
-                //cell.myImage.image = UIImage(contentsOfFile: "RC39221.jpg")
-                
-                //            cell.backgroundColor = UIColor.whiteColor() // make cell more visible in our example project
                 let lightPurple = UIColor(red: 202.0/255.0, green: 156.0/255.0, blue: 244.0/255.0, alpha: 1.0)
                 cell.layer.borderColor = lightPurple.CGColor
                 cell.layer.borderWidth = 1
                 
+            } else {
+                cell.codeLabel.text = self.catalogue.materials[indexPath.row].code
+                cell.descLabel.text = self.catalogue.materials[indexPath.row].desc
+                cell.stockQty.text = "\(self.catalogue.materials[indexPath.row].stock) in stock"
+                cell.stockField.tag = indexPath.row + 1
+                cell.plusButton.tag = indexPath.row + 1
+                cell.minusButton.tag = indexPath.row + 1
+                let lightPurple = UIColor(red: 202.0/255.0, green: 156.0/255.0, blue: 244.0/255.0, alpha: 1.0)
+                cell.layer.borderColor = lightPurple.CGColor
+                cell.layer.borderWidth = 1
             }
         }
         
@@ -404,8 +425,128 @@ extension CatalogueScreens: UICollectionViewDelegate {
         
         // get current cell
         self.selectedCell = indexPath
+        
+        // Write a shitty code just to catch the deadline - revamp later
+        let alert = UIAlertController(title: "Options", message: "Please choose one", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Add to cart", style: .Default, handler: { (action: UIAlertAction!) in
+            let order = Parts()
+            var material = Materials()
+            let cell = self.myCollection.cellForItemAtIndexPath(indexPath) as! GridViewCell
+            var price = 0.0
+            if (self.selectedOption != .ALL) {
+                price = self.catalogue.materialGroups[self.selectedRow].materials[self.selectedCell.row].cash_p_m
+            } else {
+                price = self.catalogue.materials[self.selectedCell.row].cash_p_m
+            }
+            let qty = cell.stockField.text
+            let totalPrice = price * Double(qty!)!
+            if (self.selectedOption == .MATERIAL_GROUP) {
+                material = self.catalogue.materialGroups[self.selectedRow].materials[indexPath.row]
+            } else if (self.selectedOption == .SUB_MATERIAL_GROUP){
+                
+            } else {
+                material = self.catalogue.materials[indexPath.row]
+            }
+            order.code = material.code
+            order.desc = material.desc!
+            order.total_qty = qty!
+            order.total_amount_one = String(material.cash_p_m)
+            order.sum_one = String(totalPrice)
+            order.ma = ""
+            
+            // Read from realm
+            BackgroundFunctions.mitigrateRealm()
+            let realm = try! Realm()
+            var user = BackgroundFunctions.getdefaultClient().code
+            if (BackgroundFunctions.switchOff) {
+                user = BackgroundFunctions.continueCustomer
+            }
+            let query = "user = '\(user)'"
+            let results: Results<CatalogueCart> = realm.objects(CatalogueCart.self).filter(query)
+            let catalogueCart = CatalogueCart()
+            var catalogueCarts = [CatalogueCart]()
+            catalogueCarts = Array(results)
+            
+            let cnt = catalogueCarts.count
+            
+            // Update stock of material
+            try! realm.write {
+                let result = realm.objects(Materials.self).filter("code = '\(material.code)'").first
+                result!.stock -= Double(qty!)!
+            }
+            
+            if (cnt > 0) {
+                do {
+                    try! realm.write {
+                        // Check the order
+                        var checkDuplicate: Bool = false
+                        for i in 0..<catalogueCarts[0].items.count {
+                            let checkItem = catalogueCarts[0].items[i]
+                            if (checkItem.code == order.code) {
+                                checkDuplicate = true
+                                let total_qty = Double(catalogueCarts[0].items[i].total_qty)! + Double(order.total_qty)!
+                                let total = Double(catalogueCarts[0].items[i].sum_one)! + Double(order.sum_one)!
+                                catalogueCarts[0].items[i].total_qty = String(total_qty)
+                                catalogueCarts[0].items[i].sum_one = String(total)
+                                catalogueCarts[0].cart_total_price += Double(order.sum_one)!
+                            }
+                        }
+                        if (!checkDuplicate) {
+                            realm.add(order, update: true)
+                            catalogueCarts[0].items.append(order)
+                            catalogueCarts[0].cart_total_price = catalogueCarts[0].cart_total_price + totalPrice
+                        }
+                    }
+                } catch let error as NSError {
+                    print(error)
+                }
+            } else {
+                catalogueCart.code = "\(user)_\(cnt+1)"
+                catalogueCart.cart_total_price = totalPrice
+                catalogueCart.finished = false
+                catalogueCart.user = user
+                catalogueCart.created_date = NSDate()
+                
+                do {
+                    try! realm.write {
+                        realm.add(catalogueCart)
+                        realm.add(order, update: true)
+                        catalogueCart.items.append(order)
+                    }
+                } catch let error as NSError {
+                    print(error)
+                }
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "Go to details", style: .Default, handler: { (action: UIAlertAction!) in
+            self.isSegue = true
+            let mapViewControllerObj = self.storyboard?.instantiateViewControllerWithIdentifier("CatalogueOrderDetailScene") as! CatalogueDetails
+            //let catalogueDetail = mapViewControllerObj?.topViewController as! CatalogueDetails
+            mapViewControllerObj.delegate = self
+            self.navigationController!.pushViewController(mapViewControllerObj, animated: true)
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
 }
 
-
+extension CatalogueScreens: UISearchBarDelegate {
+    // This method updates filteredData based on the text in the Search Box
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        // When there is no text, filteredData is the same as the original data
+        if searchText.isEmpty {
+            filteredData = self.catalogue.materials
+        } else {
+            // The user has entered text into the search box
+            // Use the filter method to iterate over all items in the data array
+            // For each item, return true if the item should be included and false if the
+            // item should NOT be included
+            filteredData = self.catalogue.forTheFuckSakeFilter(searchText)
+            numCell = filteredData.count
+            print(filteredData.first?.code)
+        }
+        myCollection.reloadData()
+    }
+    
+}

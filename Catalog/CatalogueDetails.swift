@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import ActionSheetPicker_3_0
 
 protocol CatalogueDetailsDelegate {
     func loadCatalogueDetails(controller: CatalogueDetails)
@@ -27,7 +28,6 @@ class CatalogueDetails: UIViewController {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var clientCodeTextField: UITextField!
     @IBOutlet weak var uiPickerView: UIView!
-    @IBOutlet weak var clientCodePickerView: UIPickerView!
     @IBOutlet weak var addToCartButton: UIButton!
     
     // Offline - unstable
@@ -46,9 +46,6 @@ class CatalogueDetails: UIViewController {
         self.moreInfoTextView.delegate = self
         self.moreInfoTextView.text = "Additional Info"
         self.moreInfoTextView.textColor = UIColor.lightGrayColor()
-        
-        self.clientCodePickerView.dataSource = self
-        self.clientCodePickerView.delegate = self
         
         self.clientCodeTextField.text = BackgroundFunctions.getdefaultClient().code
     }
@@ -95,29 +92,38 @@ class CatalogueDetails: UIViewController {
     }
     
     // Do a shitty job, my memory is overloaded at this step. DND mode
-    @IBAction func getClientCode() {
+    @IBAction func getClientCode(sender: UIButton) {
         if (checkOnline) {
             let apiRequest = dispatch_group_create()
             contactList.importContact(apiRequest)
             dispatch_group_notify(apiRequest, dispatch_get_main_queue()) {
-                self.clientCodePickerView.reloadAllComponents()
-                self.hideUIPickerView(false)
+                self.pickerViewShow(self.contactList.toCodeArray(), sender: sender)
             }
         } else {
             readContactLocal()
+            pickerViewShow(contactList.toCodeArray(), sender: sender)
         }
     }
     
     @IBAction func placeOrder(sender: UIButton) {
         
-        if (addToCartButton.titleLabel?.text != "HOME") {
+        if (addToCartButton.titleLabel?.text != "Continue") {
             addToCart()
         } else {
-            let cartViewController = self.storyboard!.instantiateViewControllerWithIdentifier("MainMenu")
-            
-            self.navigationController!.pushViewController(cartViewController, animated: true)
+            self.performSegueWithIdentifier("unwindToCatalogue", sender: self)
         }
         
+    }
+    
+    func pickerViewShow(string: [String], sender: AnyObject?) {
+        //print(string)
+        ActionSheetMultipleStringPicker.showPickerWithTitle("Pick a group", rows: [
+            string
+            ], initialSelection: [1], doneBlock: {
+                picker, values, indexes in
+                print(indexes)
+                return
+            }, cancelBlock: { ActionMultipleStringCancelBlock in return }, origin: sender )
     }
     
     func addToCart() {
@@ -170,7 +176,7 @@ class CatalogueDetails: UIViewController {
                         catalogueCarts[0].cart_total_price = catalogueCarts[0].cart_total_price + Double(totalPriceLabel.text!)!
                     }
                 }
-                addToCartButton.setTitle("HOME", forState: .Normal)
+                addToCartButton.setTitle("Continue", forState: .Normal)
             } catch let error as NSError {
                 print(error)
             }
@@ -187,58 +193,11 @@ class CatalogueDetails: UIViewController {
                     realm.add(order, update: true)
                     catalogueCart.items.append(order)
                 }
-                addToCartButton.setTitle("HOME", forState: .Normal)
+                addToCartButton.setTitle("Continue", forState: .Normal)
             } catch let error as NSError {
                 print(error)
             }
         }
-        
-//        // If all carts are saved, then create a new one
-//        if (_finished == 0) {
-//            catalogueCart.code = "\(user!)_\(cnt+1)"
-//            catalogueCart.cart_total_price = Double(totalPriceLabel.text!)!
-//            catalogueCart.finished = false
-//            catalogueCart.user = clientCodeTextField.text!
-//            catalogueCart.created_date = NSDate()
-//            
-//            do {
-//                try! realm.write {
-//                    realm.add(catalogueCart)
-//                    realm.add(order, update: true)
-//                    catalogueCart.items.append(order)
-//                }
-//                 addToCartButton.setTitle("Go to cart", forState: .Normal)
-//            } catch let error as NSError {
-//                print(error)
-//            }
-//        } else {
-//            do {
-//                try! realm.write {
-//                    // Check the order
-//                    var checkDuplicate: Bool = false
-//                    for i in 0..<catalogueCarts[_finished].items.count {
-//                        let checkItem = catalogueCarts[_finished].items[i]
-//                        if (checkItem.code == order.code) {
-//                            checkDuplicate = true
-//                            let total_qty = Double(catalogueCarts[_finished].items[i].total_qty)! + Double(order.total_qty)!
-//                            let total = Double(catalogueCarts[_finished].items[i].sum_one)! + Double(order.sum_one)!
-//                            catalogueCarts[_finished].items[i].total_qty = String(total_qty)
-//                            catalogueCarts[_finished].items[i].sum_one = String(total)
-//                            catalogueCarts[_finished].cart_total_price += Double(order.sum_one)!
-//                        }
-//                    }
-//                    if (!checkDuplicate) {
-//                        catalogueCarts[_finished].items.append(order)
-//                        catalogueCarts[_finished].cart_total_price = catalogueCarts[_finished].cart_total_price + Double(totalPriceLabel.text!)!
-//                    }
-//                }
-//                addToCartButton.setTitle("Go to cart", forState: .Normal)
-//            } catch let error as NSError {
-//                print(error)
-//            }
-//        }
-        
-        
         
     }
     
@@ -274,8 +233,6 @@ class CatalogueDetails: UIViewController {
     
     func readContactLocal() {
         contactList.getFromRealm()
-        self.hideUIPickerView(false)
-        self.clientCodePickerView.reloadAllComponents()
     }
     
 }
